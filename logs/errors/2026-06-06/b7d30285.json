@@ -1,0 +1,16 @@
+{
+    "error_id": "b7d30285",
+    "timestamp": "2026-06-06T03:30:49.904968",
+    "error_type": "AttributeError",
+    "error_message": "module 'discord' has no attribute '__import__'",
+    "traceback": "NoneType: None\n",
+    "context": {
+        "command": "about",
+        "user_id": 1378603697755521044,
+        "user_name": "_katxd.xyz (Kazehara KaiTy)",
+        "guild_id": 1405590500668604518,
+        "channel_id": 1405600265247264980,
+        "interaction_id": 1512554311031455956,
+        "view_id": null
+    }
+}

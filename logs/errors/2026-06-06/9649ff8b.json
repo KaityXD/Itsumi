@@ -1,0 +1,16 @@
+{
+    "error_id": "9649ff8b",
+    "timestamp": "2026-06-06T03:29:58.705210",
+    "error_type": "NotFound",
+    "error_message": "404 Not Found (error code: 10062): Unknown interaction",
+    "traceback": "NoneType: None\n",
+    "context": {
+        "command": "help",
+        "user_id": 1378603697755521044,
+        "user_name": "_katxd.xyz (Kazehara KaiTy)",
+        "guild_id": 1405590500668604518,
+        "channel_id": 1405600265247264980,
+        "interaction_id": 1512554077207269507,
+        "view_id": null
+    }
+}

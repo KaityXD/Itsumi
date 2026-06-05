@@ -1,0 +1,16 @@
+{
+    "error_id": "0b0e84ef",
+    "timestamp": "2026-06-06T03:23:59.895351",
+    "error_type": "TypeError",
+    "error_message": "InteractionResponse.send_message() got an unexpected keyword argument 'container'",
+    "traceback": "NoneType: None\n",
+    "context": {
+        "command": "help",
+        "user_id": 1378603697755521044,
+        "user_name": "_katxd.xyz (Kazehara KaiTy)",
+        "guild_id": 1405590500668604518,
+        "channel_id": 1405591465299677247,
+        "interaction_id": 1512552591077281873,
+        "view_id": null
+    }
+}
