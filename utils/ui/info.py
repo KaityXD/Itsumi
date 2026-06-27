@@ -41,8 +41,8 @@ class PageJumpModal(discord.ui.Modal):
 
 
 class HelpDropdown(discord.ui.Select):
-    def __init__(self, bot, cogs, user, help_menu):
-        self.user = user
+    def __init__(self, bot, cogs, user_or_id, help_menu):
+        self.user_id = user_or_id if isinstance(user_or_id, int) else (user_or_id.id if user_or_id else None)
         self.help_menu = help_menu
         cog_emojis = {
             "Fun": "🎮",
@@ -79,7 +79,7 @@ class HelpDropdown(discord.ui.Select):
         )
 
     async def callback(self, interaction: discord.Interaction):
-        if interaction.user.id != self.user.id:
+        if self.user_id and interaction.user.id != self.user_id:
             return await interaction.response.send_message(
                 "Not your menu!", ephemeral=True
             )
@@ -99,48 +99,59 @@ class HelpDropdown(discord.ui.Select):
 
 
 class HelpMenu(discord.ui.View):
-    def __init__(self, ctx, bot, commands_per_page=6):
+    def __init__(self, ctx=None, bot=None, commands_per_page=6, user_id=None):
         super().__init__(timeout=180)
         self.ctx = ctx
         self.bot = bot
         self.commands_per_page = commands_per_page
         self.current_page = 0
         self.cog_filter = None
+        self.user_id = user_id or (ctx.author.id if ctx and ctx.author else None)
 
-        # Filter cogs to avoid internal ones
-        self.valid_cog_names = [
-            name for name, cog in bot.cogs.items() if name != "ErrorHandlerCog"
-        ]
-
-        # Pre-cache all command data
+        self.valid_cog_names = []
         self.all_command_data = []
-        for cog_name in self.valid_cog_names:
-            cog = bot.get_cog(cog_name)
-            if not cog:
-                continue
-            for cmd in cog.get_commands():
-                if isinstance(cmd, discord.SlashCommandGroup):
-                    self.all_command_data.append((cmd, "group", cog_name))
-                    for sub in cmd.subcommands:
-                        self.all_command_data.append((sub, "sub", cog_name))
-                elif isinstance(cmd, discord.SlashCommand):
-                    self.all_command_data.append((cmd, "slash", cog_name))
-                elif isinstance(cmd, discord.ext.commands.Command):
-                    if isinstance(cmd, discord.ext.commands.Group):
-                        self.all_command_data.append((cmd, "prefix_group", cog_name))
-                        for sub in cmd.commands:
-                            self.all_command_data.append((sub, "prefix_sub", cog_name))
-                    else:
-                        self.all_command_data.append((cmd, "prefix", cog_name))
+
+        if bot:
+            # Filter cogs to avoid internal ones
+            self.valid_cog_names = [
+                name for name, cog in bot.cogs.items() if name != "ErrorHandlerCog"
+            ]
+
+            # Pre-cache all command data
+            for cog_name in self.valid_cog_names:
+                cog = bot.get_cog(cog_name)
+                if not cog:
+                    continue
+                for cmd in cog.get_commands():
+                    if isinstance(cmd, discord.SlashCommandGroup):
+                        self.all_command_data.append((cmd, "group", cog_name))
+                        for sub in cmd.subcommands:
+                            self.all_command_data.append((sub, "sub", cog_name))
+                    elif isinstance(cmd, discord.SlashCommand):
+                        self.all_command_data.append((cmd, "slash", cog_name))
+                    elif isinstance(cmd, discord.ext.commands.Command):
+                        if isinstance(cmd, discord.ext.commands.Group):
+                            self.all_command_data.append((cmd, "prefix_group", cog_name))
+                            for sub in cmd.commands:
+                                self.all_command_data.append((sub, "prefix_sub", cog_name))
+                        else:
+                            self.all_command_data.append((cmd, "prefix", cog_name))
 
         self.update_filtered_commands()
 
         # Row 1: Dropdown
-        self.dropdown = HelpDropdown(bot, self.valid_cog_names, ctx.author, self)
-        self.add_item(self.dropdown)
+        if bot and self.user_id:
+            self.dropdown = HelpDropdown(bot, self.valid_cog_names, self.user_id, self)
+            self.add_item(self.dropdown)
 
         # Row 2: Navigation
         self.update_button_states()
+
+    def __get_init_args__(self):
+        return {
+            "commands_per_page": self.commands_per_page,
+            "user_id": self.user_id,
+        }
 
     def update_filtered_commands(self):
         if self.cog_filter:
@@ -218,7 +229,7 @@ class HelpMenu(discord.ui.View):
     async def prev_button(
         self, button: discord.ui.Button, interaction: discord.Interaction
     ):
-        if interaction.user.id != self.ctx.author.id:
+        if self.user_id and interaction.user.id != self.user_id:
             return await interaction.response.send_message(
                 EmbedFactory.toast("Not your menu!", interaction, success=False), ephemeral=True
             )
@@ -235,7 +246,7 @@ class HelpMenu(discord.ui.View):
     async def page_indicator(
         self, button: discord.ui.Button, interaction: discord.Interaction
     ):
-        if interaction.user.id != self.ctx.author.id:
+        if self.user_id and interaction.user.id != self.user_id:
             return await interaction.response.send_message(
                 EmbedFactory.toast("Not your menu!", interaction, success=False), ephemeral=True
             )
@@ -245,7 +256,7 @@ class HelpMenu(discord.ui.View):
     async def next_button(
         self, button: discord.ui.Button, interaction: discord.Interaction
     ):
-        if interaction.user.id != self.ctx.author.id:
+        if self.user_id and interaction.user.id != self.user_id:
             return await interaction.response.send_message(
                 EmbedFactory.toast("Not your menu!", interaction, success=False), ephemeral=True
             )

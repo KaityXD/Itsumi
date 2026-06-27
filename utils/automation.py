@@ -62,6 +62,10 @@ async def restore_all_views(bot: discord.Bot):
                     filtered_args = {k: v for k, v in init_args.items() if k in sig.parameters}
                 else:
                     filtered_args = init_args
+                
+                # Automatically inject bot if the constructor requests it and it's not already provided
+                if "bot" in sig.parameters and "bot" not in filtered_args:
+                    filtered_args["bot"] = bot
             except Exception:
                 filtered_args = init_args
 

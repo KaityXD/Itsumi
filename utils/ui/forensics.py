@@ -13,13 +13,20 @@ class ForensicTraceExplorer(discord.ui.View):
     Forensic Trace Engine: Reconstructs the chain of custody for any forensic ID.
     Visualizes the journey from command execution to final response.
     """
-    def __init__(self, ctx: Union[discord.ApplicationContext, discord.Interaction], start_id: str):
+    def __init__(
+        self, 
+        ctx: Optional[Union[discord.ApplicationContext, discord.Interaction]] = None, 
+        start_id: Optional[str] = None
+    ):
         super().__init__(timeout=300)
         self.ctx = ctx
         self.start_id = start_id
         self.chain = []
         self.current_index = 0
         self._interaction_lock = asyncio.Lock()
+
+    def __get_init_args__(self) -> Dict[str, Any]:
+        return {"start_id": self.start_id}
 
     async def initialize(self):
         """Pre-fetches the trace chain."""
