@@ -42,6 +42,24 @@ class Settings:
     MAX_STREAK_LEADERBOARD: int = 10
     ENV: str = os.getenv("ENV", "production")
 
+    def __init__(self):
+        # Guarantee critical attributes exist
+        # even if they were commented out or missing in a customized local config
+        if not hasattr(self, "OWNERS"):
+            self.OWNERS = [1378603697755521044]
+        if not hasattr(self, "TOKEN"):
+            self.TOKEN = os.getenv("TOKEN", "")
+        if not hasattr(self, "DEFAULT_COLOR"):
+            self.DEFAULT_COLOR = 0x3498DB
+        if not hasattr(self, "SUCCESS_COLOR"):
+            self.SUCCESS_COLOR = 0x2ECC71
+        if not hasattr(self, "ERROR_COLOR"):
+            self.ERROR_COLOR = 0xE74C3C
+        if not hasattr(self, "WARN_COLOR"):
+            self.WARN_COLOR = 0xF1C40F
+        if not hasattr(self, "SYSTEM_COLOR"):
+            self.SYSTEM_COLOR = 0xA372FB
+
     @property
     def IS_DEV(self) -> bool:
         return self.ENV.lower() == "development"

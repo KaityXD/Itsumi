@@ -199,7 +199,8 @@ class UniversalErrorHandler:
         view = None
         # Add a "View Trace" button if the user is an owner
         from config import config
-        if ctx.author.id in config.OWNERS:
+        owners = getattr(config, "OWNERS", [])
+        if ctx.author.id in owners:
             from utils.ui.forensics import ForensicTraceExplorer
             from utils.ui.fun_layout import FunLayoutView
             
@@ -277,7 +278,8 @@ class UniversalErrorHandler:
 
         view = None
         from config import config
-        if interaction.user.id in config.OWNERS:
+        owners = getattr(config, "OWNERS", [])
+        if interaction.user.id in owners:
             from utils.ui.forensics import ForensicTraceExplorer
             from utils.ui.fun_layout import FunLayoutView
             

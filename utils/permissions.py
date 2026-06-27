@@ -83,7 +83,8 @@ class PermissionManager:
         """Determines the absolute permission bitfield for a user."""
         # 1. Root Bypass
         from config import config
-        if user.id in config.OWNERS:
+        owners = getattr(config, "OWNERS", [])
+        if user.id in owners:
             return SecPerm.ROOT_ACCESS | SecPerm.ADMINISTRATOR | 0xFFFFF
 
         if isinstance(user, discord.User) or not user.guild:
@@ -111,7 +112,8 @@ class PermissionManager:
     async def get_user_level(user: Union[discord.Member, discord.User]) -> int:
         """Legacy resolver for backward compatibility."""
         from config import config
-        if user.id in config.OWNERS:
+        owners = getattr(config, "OWNERS", [])
+        if user.id in owners:
             return PermissionLevel.BOT_OWNER
 
         if isinstance(user, discord.User) or not user.guild:
