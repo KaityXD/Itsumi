@@ -111,9 +111,22 @@ class FunLayoutView(discord.ui.DesignerView):
         if container:
             self.add_item(container)
             self.r_id = getattr(container, "_r_id", None)
+            
+            title = "Restored"
+            if len(container.items) > 0 and hasattr(container.items[0], "content"):
+                title = container.items[0].content.lstrip("# ")
+                
+            body = ""
+            if len(container.items) > 2:
+                item = container.items[2]
+                if hasattr(item, "content"):
+                    body = item.content
+                elif hasattr(item, "items") and len(item.items) > 0 and hasattr(item.items[0], "content"):
+                    body = item.items[0].content
+                    
             self._container_data = {
-                "title": container.children[0].content.lstrip("# ") if len(container.children) > 0 else "Restored",
-                "body": container.children[2].content if len(container.children) > 2 else ""
+                "title": title,
+                "body": body
             }
 
         if original_view:
