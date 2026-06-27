@@ -33,6 +33,9 @@ ENV/
 assets/database/guilds/*/database.db
 assets/database/global/database.db
 *.db
+*.db-shm
+*.db-wal
+*.db-journal
 *.sqlite3
 
 # Logs

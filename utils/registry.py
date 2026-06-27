@@ -179,17 +179,22 @@ class UniversalRegistry:
         # We attempt to capture common initialization attributes
         # Developers can define __get_init_args__ to provide custom restoration data
         init_args = {}
-        if hasattr(view_obj, "__get_init_args__"):
-            init_args = view_obj.__get_init_args__()
-        else:
-            # Fallback: try to capture common attributes
-            for attr in ["timeout", "ctx", "user", "message", "parent_v_id", "view_id"]:
-                if hasattr(view_obj, attr):
-                    val = getattr(view_obj, attr)
-                    if isinstance(val, (int, str, float, bool, list, dict)) or val is None:
-                        init_args[attr] = val
-                    elif isinstance(val, (discord.User, discord.Member, discord.Role, discord.TextChannel)):
-                        init_args[attr] = val.id
+        try:
+            if hasattr(view_obj, "__get_init_args__"):
+                init_args = view_obj.__get_init_args__()
+            else:
+                # Fallback: try to capture common attributes
+                for attr in ["timeout", "ctx", "user", "message", "parent_v_id", "view_id"]:
+                    if hasattr(view_obj, attr):
+                        val = getattr(view_obj, attr)
+                        if isinstance(val, (int, str, float, bool, list, dict)) or val is None:
+                            init_args[attr] = val
+                        elif isinstance(val, (discord.User, discord.Member, discord.Role, discord.TextChannel)):
+                            init_args[attr] = val.id
+        except AttributeError:
+            # Subclass attributes needed for serialization are not initialized yet.
+            # We will ignore this early registration and rely on loop.call_soon or manual register.
+            return
 
         view_info = {
             "type": "VIEW",

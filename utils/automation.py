@@ -105,8 +105,18 @@ def _automate_views():
                 # Generate a deterministic custom_id based on v_id and position
                 item.custom_id = f"{self.view_id}:{item.__class__.__name__}:{index}"
 
-        # Register the view with the registry
-        registry.register_view(self.view_id, self)
+        # Register the view with the registry safely and asynchronously if loop is running
+        try:
+            loop = asyncio.get_running_loop()
+            if loop.is_running():
+                loop.call_soon(lambda: registry.register_view(self.view_id, self))
+            else:
+                registry.register_view(self.view_id, self)
+        except (RuntimeError, AttributeError):
+            try:
+                registry.register_view(self.view_id, self)
+            except Exception:
+                pass
 
     discord.ui.View.__init__ = patched_init
     logger.trace("Successfully patched discord.ui.View for v-id and component automation.")
